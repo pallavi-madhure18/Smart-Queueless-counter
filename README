@@ -1,1 +1,95 @@
+# 🎫 Smart QueueLess Counter
 
+**AI-powered digital queue management system** built with Python and Streamlit.
+Customers take a digital token instead of standing in a line, staff manage counters from a control panel, and a machine-learning model predicts the waiting time.
+
+---
+
+## ✨ Features
+
+| Module | What it does |
+|---|---|
+| 🏠 **Dashboard** | Live view of people waiting, estimated wait, open counters, tokens served today, the "Now Serving" token and the queue board |
+| 🎫 **Get Token** | Choose a service (Banking, Hospital, College Office, etc.) and receive a digital token with a predicted wait time |
+| 📷 **AI Queue Vision** | Upload an image or use the webcam to estimate how many people are in a queue (OpenCV demo) |
+| 🧑‍💼 **Staff Console** | Open or close 4 counters, call the next token and mark tokens as completed |
+| 📊 **Analytics** | Total tokens, served count, average wait, service usage chart, data table and CSV export |
+| ⚙️ **System** | Technology stack overview |
+
+## 🧠 How the wait-time prediction works
+
+A `RandomForestRegressor` (scikit-learn) is trained at startup on synthetic data. It uses:
+
+- queue size
+- number of open counters
+- average service time
+- peak-hour factor
+
+The prediction is cached with `st.cache_resource`, so training happens only once per server run.
+
+> **Note:** the model is trained on simulated data. For production use, retrain it with real service-time logs from the `tokens` table.
+
+## 🛠️ Tech Stack
+
+- **Python** 3.11+
+- **Streamlit**: web interface
+- **SQLAlchemy + SQLite**: token storage (`queueless.db`, created automatically)
+- **scikit-learn**: wait-time prediction
+- **OpenCV + Pillow**: queue image analysis
+- **Pandas / NumPy**: data processing
+
+## 🚀 Getting Started
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/<your-username>/<your-repo>.git
+cd <your-repo>
+
+# 2. (Recommended) create a virtual environment
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+
+# 3. Install dependencies
+pip install -r requirements.txt
+
+# 4. Run the app
+streamlit run app.py
+```
+
+The app opens at **http://localhost:8501**.
+
+## 📁 Project Structure
+
+```
+.
+├── app.py              # Main Streamlit application
+├── requirements.txt    # Python dependencies
+├── README.md
+├── .gitignore
+└── queueless.db        # SQLite database (auto-generated, not committed)
+```
+
+## 🧪 Typical Workflow
+
+1. Open **Get Token** and generate a few tokens.
+2. Open **Staff Console**, then **Call Next** on an open counter. The token moves to *serving*.
+3. Click **Complete** to mark it as served.
+4. Check **Dashboard** and **Analytics** to see the updated numbers.
+
+## ⚠️ Known Limitations
+
+- **Queue Vision** uses simple edge/contour detection, so counts are approximate. It is meant as a demo.
+- Counter open/closed status is stored per browser session, while tokens are stored in the database.
+- The app has no user login, so it is not ready for public deployment as-is.
+
+## 🔮 Future Improvements
+
+- [ ] Replace the contour counter with **YOLO** person detection (`ultralytics`)
+- [ ] Retrain the model on real service data (XGBoost option)
+- [ ] SMS / WhatsApp notifications when a token is about to be called
+- [ ] Staff authentication
+- [ ] Multi-branch support and PostgreSQL
+
+## 📜 License
+
+This project is released under the MIT License. Add a `LICENSE` file if you want to make it official.
